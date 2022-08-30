@@ -28,8 +28,5 @@ export default function createSession(
 }
 
 export function deleteSession(res: Response) {
-  res.setHeader('Authorization', `Bearer Invalid`);
-  res.cookie('X-Refresh-Token', ' ', { sameSite: 'lax', maxAge: 1 });
-
   return true;
 }
