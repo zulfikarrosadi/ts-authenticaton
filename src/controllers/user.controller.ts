@@ -5,21 +5,31 @@ import createSession from '../utils/sessionUtil';
 import hashPassword from '../utils/hashPassword';
 
 export async function createUserHandler(
-  req: Request<{}, {}, Required<TCreateUserInput['body']>>,
+  req: Request<{}, {}, Required<TCreateUserInput['body']>> & {
+    user?: { email: string };
+  },
   res: Response<
     Omit<
       Required<TCreateUserInput['body']>,
       'password' | 'passwordConfirmation'
-    >
+    > & { accessToken: string; userId: number }
   >,
 ) {
   const { email, password } = req.body;
   try {
     const hashedPassword = await hashPassword(password);
     const user = await createUser({ email, password: hashedPassword });
-    createSession(user.email, user.id, res);
+    const token = createSession({ email: user.email, userId: user.id });
 
-    return res.status(201).json(user);
+    res.cookie('refreshToken', token.get('refreshToken'), {
+      httpOnly: true,
+      sameSite: 'lax',
+    });
+    return res.status(201).json({
+      email: user.email,
+      userId: user.id,
+      accessToken: token.get('accessToken'),
+    });
   } catch (error) {
     console.log(error);
     return res.status(500).json(error);
