@@ -19,6 +19,7 @@ export function verifyJwt(token: string): {
 } {
   try {
     const decoded = verify(token, c.get('publicKey')) as TJwtPayload;
+    if (!decoded.isValid) throw Error;
     return { decoded };
   } catch (error) {
     return { decoded: null };
