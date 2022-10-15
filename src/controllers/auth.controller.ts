@@ -39,13 +39,13 @@ export async function logOutUserHandler(req: Request, res: Response) {
   try {
     const invalidToken = deleteSession(req);
 
-    res.cookie('refreshToken', '', {
-      maxAge: 0,
-      sameSite: 'lax',
-      httpOnly: true,
-    });
     return res
       .status(200)
+      .cookie('refreshToken', '', {
+        maxAge: 0,
+        sameSite: 'lax',
+        httpOnly: true,
+      })
       .json({ email: null, userId: null, accessToken: invalidToken });
   } catch (error) {
     console.log(error);
