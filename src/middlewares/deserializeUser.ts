@@ -7,14 +7,9 @@ export default function deserializeUser(
   res: Response,
   next: NextFunction,
 ) {
-  if (
-    req.headers['authorization'] === 'Bearer Invalid' ||
-    !req.headers['authorization']
-  ) {
-    return next();
-  }
+  if (!req.headers.authorization) return next();
 
-  const accessToken = req.headers['authorization'].split(' ')[2];
+  const accessToken = req.headers.authorization.split(' ')[1];
   if (!accessToken) return next();
 
   const { decoded: accessTokenPayload } = verifyJwt(accessToken);
@@ -29,12 +24,10 @@ export default function deserializeUser(
   const { decoded: refreshTokenPayload } = verifyJwt(refreshToken);
   if (!refreshTokenPayload) return next();
 
-  createSession(
-    refreshTokenPayload.email,
-    refreshTokenPayload.userId,
-    res,
-    false,
-  );
+  createSession({
+    email: refreshTokenPayload.email,
+    userId: refreshTokenPayload.userId,
+  });
 
   return next();
 }

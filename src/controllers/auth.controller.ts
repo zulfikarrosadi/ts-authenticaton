@@ -15,9 +15,20 @@ export async function loginUserHandler(
     const isPasswordVerified = await compare(password, user.password);
 
     if (!isPasswordVerified) throw Error('Email or Password is wrong');
-    createSession(user.email, user.id, res);
+    const token = createSession({
+      email: user.email,
+      userId: user.id,
+    });
 
-    return res.status(200).json({ email: user.email, userId: user.id });
+    res.cookie('refreshToken', token.get('refreshToken'), {
+      httpOnly: true,
+      sameSite: 'lax',
+    });
+    return res.status(200).json({
+      email: user.email,
+      userId: user.id,
+      accessToken: token.get('accessToken'),
+    });
   } catch (error) {
     console.log(error);
     return res.status(400).json({ error: error.message });
@@ -26,10 +37,18 @@ export async function loginUserHandler(
 
 export async function logOutUserHandler(req: Request, res: Response) {
   try {
-    return res.writeHead(204, 'logout success');
+    const invalidToken = deleteSession(req);
+
+    res.cookie('refreshToken', '', {
+      maxAge: 0,
+      sameSite: 'lax',
+      httpOnly: true,
+    });
+    return res
+      .status(200)
+      .json({ email: null, userId: null, accessToken: invalidToken });
   } catch (error) {
     console.log(error);
-
     return res.status(500).json({ message: 'logout failed' });
   }
 }
