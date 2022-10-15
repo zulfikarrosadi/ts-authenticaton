@@ -18,7 +18,7 @@ export default function deserializeUser(
     return next();
   }
 
-  const refreshToken = req.cookies['X-Refresh-Token'];
+  const refreshToken = req.cookies.refreshToken;
   if (!refreshToken) return next();
 
   const { decoded: refreshTokenPayload } = verifyJwt(refreshToken);
