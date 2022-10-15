@@ -37,10 +37,18 @@ export async function loginUserHandler(
 
 export async function logOutUserHandler(req: Request, res: Response) {
   try {
-    return res.writeHead(204, 'logout success');
+    const invalidToken = deleteSession(req);
+
+    res.cookie('refreshToken', '', {
+      maxAge: 0,
+      sameSite: 'lax',
+      httpOnly: true,
+    });
+    return res
+      .status(200)
+      .json({ email: null, userId: null, accessToken: invalidToken });
   } catch (error) {
     console.log(error);
-
     return res.status(500).json({ message: 'logout failed' });
   }
 }
