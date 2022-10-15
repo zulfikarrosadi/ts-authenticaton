@@ -41,6 +41,6 @@ export function deleteSession(req: Request) {
   accessTokenPayload.email = null;
   accessTokenPayload.userId = null;
 
-  const newToken = createJwt({ ...accessTokenPayload }, { expiresIn: 0 });
+  const newToken = createJwt({ ...accessTokenPayload });
   return newToken;
 }
