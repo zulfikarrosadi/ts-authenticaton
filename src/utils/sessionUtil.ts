@@ -34,7 +34,7 @@ export default function createSession({
 }
 
 export function deleteSession(req: Request) {
-  const token = req.headers.authorization.split(' ')[1];
+  const { accessToken: token } = req.cookies;
   const { decoded: accessTokenPayload } = verifyJwt(token);
 
   accessTokenPayload.isValid = false;
