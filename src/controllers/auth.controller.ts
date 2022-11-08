@@ -24,6 +24,12 @@ export async function loginUserHandler(
       httpOnly: true,
       sameSite: 'lax',
     });
+
+    res.cookie('accessToken', token.get('accessToken'), {
+      httpOnly: true,
+      sameSite: 'lax',
+      maxAge: 54000,
+    });
     return res.status(200).json({
       email: user.email,
       userId: user.id,
@@ -46,7 +52,12 @@ export async function logOutUserHandler(req: Request, res: Response) {
         sameSite: 'lax',
         httpOnly: true,
       })
-      .json({ email: null, userId: null, accessToken: invalidToken });
+      .cookie('accessToken', '', {
+        maxAge: 0,
+        sameSite: 'lax',
+        httpOnly: true,
+      })
+      .json({ message: 'logout success' });
   } catch (error) {
     console.log(error);
     return res.status(500).json({ message: 'logout failed' });

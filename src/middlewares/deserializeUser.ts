@@ -7,9 +7,9 @@ export default function deserializeUser(
   res: Response,
   next: NextFunction,
 ) {
-  if (!req.headers.authorization) return next();
+  if (!req.cookies.accessToken) return next();
 
-  const accessToken = req.headers.authorization.split(' ')[1];
+  const { accessToken } = req.cookies;
   if (!accessToken) return next();
 
   const { decoded: accessTokenPayload } = verifyJwt(accessToken);
